@@ -5,15 +5,29 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
+    public static PatternResult isLexem(Pattern pattern, String text) {
+        Matcher matcher = pattern.matcher(text);
+        PatternResult res = new PatternResult();
+        res.isFound = matcher.matches();
+        if (matcher.find()) {
+            res.start = matcher.start();
+            res.end = matcher.end();
+        }
 
+        return res;
+    }
+    
     public static void main(String[] args) {
         try {
-            Automat numberAutomat = new Automat("numberAutomat.txt");
-            Automat stringAutomat = new Automat("stringAutomat.txt");
-            Automat operatorAutomat = new Automat("operatorAutomat.txt");
-            Automat idAutomat = new Automat("idAutomat.txt");
+            Pattern numberPattern = Pattern.compile("(-)?(0|[1-9]+[0-9]*|[1-9]+\\.[0-9]+|0\\.[0-9]*[1-9]+[0-9]*)(e[+-]?[1-9]+[0-9]*)?");
+            Pattern stringPattern = Pattern.compile("('[^']*'|\"[^\"]*\"|`[^`]*`)");
+            Pattern operatorPattern = Pattern.compile("((\\+[+=]?)|(\\-[-=]?)|(\\*[=]?)|([\\<\\>][=]?)|(\\/[=]?)|([=]{1,3})|[!]|([&]{1,2})|([|]{1,2}))");
+            Pattern idPattern = Pattern.compile("([_a-zA-Z]+[a-zA-Z_0-9]*)");
+            Pattern keywordsPattern = Pattern.compile("(let|var|const|for|while|do|if|else|break|continue)");
 
             File file = new File("program.txt");
             Scanner fileReader = new Scanner(file);
@@ -50,23 +64,23 @@ public class Main {
                         }
                     } else {
                         if (!lexemWasPrinted && lexem.length() > 0) {
-                            if (keywords.contains("" + lexem)) {
+                            if (Main.isLexem(keywordsPattern, "" + lexem).isFound) {
                                 System.out.print(lexem);
                                 System.out.println(" - keyword");
                                 lexemWasPrinted = true;
-                            } else if (numberAutomat.isLexem(lexem)) {
+                            } else if (Main.isLexem(numberPattern, lexem).isFound) {
                                 System.out.print(lexem);
                                 System.out.println(" - number");
                                 lexemWasPrinted = true;
-                            } else if (idAutomat.isLexem(lexem)) {
+                            } else if (Main.isLexem(idPattern, lexem).isFound) {
                                 System.out.print(lexem);
                                 System.out.println(" - identificator");
                                 lexemWasPrinted = true;
-                            } else if (stringAutomat.isLexem(lexem)) {
+                            } else if (Main.isLexem(stringPattern, lexem).isFound) {
                                 System.out.print(lexem);
                                 System.out.println(" - string");
                                 lexemWasPrinted = true;
-                            } else if (operatorAutomat.isLexem(lexem)) {
+                            } else if (Main.isLexem(operatorPattern, lexem).isFound) {
                                 System.out.print(lexem);
                                 System.out.println(" - operator");
                                 lexemWasPrinted = true;
@@ -76,7 +90,7 @@ public class Main {
                             }
                         }
                         if (!operatorWasPrinted && operator.length() > 0) {
-                            if (operatorAutomat.isLexem(operator)) {
+                            if (Main.isLexem(operatorPattern, operator).isFound) {
                                 System.out.print(operator);
                                 System.out.println(" - operator");
                                 operatorWasPrinted = true;
@@ -88,24 +102,24 @@ public class Main {
                     }
                 }
                 if (!lexemWasPrinted && lexem.length() > 0) {
-                    if (keywords.contains("" + lexem)) {
+                    if (Main.isLexem(keywordsPattern, "" + lexem).isFound) {
                         System.out.print(lexem);
                         System.out.println(" - keyword");
                         lexemWasPrinted = true;
                     } else
-                    if (numberAutomat.isLexem(lexem)) {
+                    if (Main.isLexem(numberPattern, lexem).isFound) {
                         System.out.print(lexem);
                         System.out.println(" - number");
                         lexemWasPrinted = true;
-                    } else if (idAutomat.isLexem(lexem)) {
+                    } else if (Main.isLexem(idPattern, lexem).isFound) {
                         System.out.print(lexem);
                         System.out.println(" - identificator");
                         lexemWasPrinted = true;
-                    } else if (stringAutomat.isLexem(lexem)) {
+                    } else if (Main.isLexem(stringPattern, lexem).isFound) {
                         System.out.print(lexem);
                         System.out.println(" - string");
                         lexemWasPrinted = true;
-                    } else if (operatorAutomat.isLexem(lexem)) {
+                    } else if (Main.isLexem(operatorPattern, lexem).isFound) {
                         System.out.print(lexem);
                         System.out.println(" - operator");
                         lexemWasPrinted = true;
@@ -115,7 +129,7 @@ public class Main {
                     }
                 }
                 if (!operatorWasPrinted&& operator.length() > 0) {
-                    if (operatorAutomat.isLexem(operator)) {
+                    if (Main.isLexem(operatorPattern, operator).isFound) {
                         System.out.print(operator);
                         System.out.println(" - operator");
                     }
